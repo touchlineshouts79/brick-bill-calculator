@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="gu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111827">
-<title>Brick Bill Calculator</title>
+
+<title>ઈંટ બિલ કેલ્ક્યુલેટર</title>
 
 <style>
 * {
@@ -13,7 +14,7 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial, "Noto Sans Gujarati", sans-serif;
     background: #f3f4f6;
     color: #111827;
 }
@@ -28,7 +29,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 h1 {
@@ -55,6 +56,30 @@ button {
     background: white;
     font-size: 22px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mode-switch {
+    display: flex;
+    background: #e5e7eb;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 13px 8px;
+    border-radius: 9px;
+    background: transparent;
+    color: #4b5563;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.mode-btn.active {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 
 .card {
@@ -99,10 +124,44 @@ input:focus {
     font-size: 17px;
 }
 
+.gst-info {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 17px;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+}
+
 .result-title {
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 15px;
+}
+
+.quantity {
+    background: #eff6ff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.quantity-label {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.quantity-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 4px;
 }
 
 .row {
@@ -123,24 +182,6 @@ input:focus {
     padding-top: 15px;
     font-size: 20px;
     font-weight: bold;
-}
-
-.quantity {
-    background: #eff6ff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-}
-
-.quantity-label {
-    color: #6b7280;
-    font-size: 13px;
-}
-
-.quantity-value {
-    font-size: 28px;
-    font-weight: bold;
-    margin-top: 4px;
 }
 
 .words-box {
@@ -214,22 +255,6 @@ input:focus {
     border-radius: 10px;
     font-weight: bold;
 }
-
-.error {
-    color: #dc2626;
-    font-size: 14px;
-    margin-top: 10px;
-    display: none;
-}
-
-.gst-info {
-    background: #f9fafb;
-    border-radius: 10px;
-    padding: 12px;
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 17px;
-}
 </style>
 </head>
 
@@ -238,33 +263,99 @@ input:focus {
 <div class="container">
 
 <header>
+
     <div>
-        <h1>Brick Bill Calculator</h1>
-        <div class="subtitle">Reverse Bill Calculator</div>
+
+        <h1>ઈંટ બિલ કેલ્ક્યુલેટર</h1>
+
+        <div class="subtitle" id="subtitle">
+            ઈંટોની સંખ્યાથી બિલની ગણતરી
+        </div>
+
     </div>
 
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <button
+        class="settings-btn"
+        onclick="openSettings()"
+    >
+        ⚙️
+    </button>
+
 </header>
 
 
-<!-- INPUT -->
+<!-- MODE -->
+
+<div class="mode-switch">
+
+    <button
+        class="mode-btn active"
+        id="regularModeBtn"
+        onclick="setMode('regular')"
+    >
+        ઈંટ → બિલ
+    </button>
+
+    <button
+        class="mode-btn"
+        id="reverseModeBtn"
+        onclick="setMode('reverse')"
+    >
+        બિલ → ઈંટ
+    </button>
+
+</div>
+
+
+<!-- INPUT CARD -->
 
 <div class="card">
 
-    <div class="field">
-        <label>Final Bill Amount (Including GST)</label>
+    <!-- REGULAR MODE -->
 
-        <input
-            type="number"
-            id="finalAmount"
-            placeholder="e.g. 45000"
-            inputmode="decimal"
-        >
+    <div id="regularInputs">
+
+        <div class="field">
+
+            <label>ઈંટોની સંખ્યા</label>
+
+            <input
+                type="number"
+                id="quantityInput"
+                placeholder="દા.ત. 5000"
+                inputmode="numeric"
+            >
+
+        </div>
+
     </div>
 
 
+    <!-- REVERSE MODE -->
+
+    <div id="reverseInputs" style="display:none;">
+
+        <div class="field">
+
+            <label>અંતિમ બિલની રકમ (GST સહિત)</label>
+
+            <input
+                type="number"
+                id="finalAmountInput"
+                placeholder="દા.ત. 45000"
+                inputmode="decimal"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- RATE -->
+
     <div class="field">
-        <label>Price Per Brick (Before GST)</label>
+
+        <label>એક ઈંટનો ભાવ (GST વગર)</label>
 
         <input
             type="number"
@@ -272,15 +363,20 @@ input:focus {
             inputmode="decimal"
             step="0.01"
         >
+
     </div>
 
+
+    <!-- GST -->
 
     <div class="gst-info">
 
         GST: <strong id="gstDisplay">12%</strong>
+
         &nbsp; | &nbsp;
 
         CGST: <strong id="cgstDisplay">6%</strong>
+
         &nbsp; | &nbsp;
 
         SGST: <strong id="sgstDisplay">6%</strong>
@@ -288,31 +384,45 @@ input:focus {
     </div>
 
 
-    <button class="calculate" onclick="calculate()">
-        Calculate
+    <button
+        class="calculate"
+        onclick="calculate()"
+    >
+        ગણતરી કરો
     </button>
 
-    <div class="error" id="error"></div>
+
+    <div
+        class="error"
+        id="error"
+    ></div>
 
 </div>
 
 
 <!-- RESULT -->
 
-<div class="card" id="resultCard" style="display:none;">
+<div
+    class="card"
+    id="resultCard"
+    style="display:none;"
+>
 
     <div class="result-title">
-        Bill Calculation
+        બિલની ગણતરી
     </div>
 
 
     <div class="quantity">
 
         <div class="quantity-label">
-            Number of Bricks
+            ઈંટોની સંખ્યા
         </div>
 
-        <div class="quantity-value" id="quantity">
+        <div
+            class="quantity-value"
+            id="quantityResult"
+        >
             -
         </div>
 
@@ -320,36 +430,65 @@ input:focus {
 
 
     <div class="row">
-        <span>Rate / Brick</span>
-        <strong id="rateResult">₹0.00</strong>
+
+        <span>એક ઈંટનો ભાવ</span>
+
+        <strong id="rateResult">
+            ₹0.00
+        </strong>
+
     </div>
 
 
     <div class="row">
-        <span>Subtotal</span>
-        <strong id="subtotal">₹0.00</strong>
+
+        <span>GST વગરની રકમ</span>
+
+        <strong id="subtotal">
+            ₹0.00
+        </strong>
+
     </div>
 
 
     <div class="row">
-        <span id="cgstLabel">CGST (6%)</span>
-        <strong id="cgst">₹0.00</strong>
+
+        <span id="cgstLabel">
+            CGST (6%)
+        </span>
+
+        <strong id="cgst">
+            ₹0.00
+        </strong>
+
     </div>
 
 
     <div class="row">
-        <span id="sgstLabel">SGST (6%)</span>
-        <strong id="sgst">₹0.00</strong>
+
+        <span id="sgstLabel">
+            SGST (6%)
+        </span>
+
+        <strong id="sgst">
+            ₹0.00
+        </strong>
+
     </div>
 
 
     <div class="row total">
-        <span>Final Bill</span>
-        <strong id="finalResult">₹0.00</strong>
+
+        <span>અંતિમ બિલ</span>
+
+        <strong id="finalResult">
+            ₹0.00
+        </strong>
+
     </div>
 
 
-    <!-- AMOUNT IN WORDS -->
+    <!-- ENGLISH AMOUNT IN WORDS -->
 
     <div class="words-box">
 
@@ -357,18 +496,20 @@ input:focus {
             Amount in Words
         </div>
 
-        <div class="words-value" id="amountWords">
+        <div
+            class="words-value"
+            id="amountWords"
+        >
             -
         </div>
 
     </div>
 
 
-    <div class="note">
-        Quantity is rounded to the nearest whole brick.
-        The actual calculated bill may therefore differ slightly
-        from the entered amount.
-    </div>
+    <div
+        class="note"
+        id="resultNote"
+    ></div>
 
 </div>
 
@@ -377,15 +518,21 @@ input:focus {
 
 <!-- SETTINGS -->
 
-<div class="modal" id="settingsModal">
+<div
+    class="modal"
+    id="settingsModal"
+>
 
 <div class="modal-content">
 
     <div class="modal-header">
 
-        <h2>Settings</h2>
+        <h2>સેટિંગ્સ</h2>
 
-        <button class="close-btn" onclick="closeSettings()">
+        <button
+            class="close-btn"
+            onclick="closeSettings()"
+        >
             ×
         </button>
 
@@ -394,7 +541,7 @@ input:focus {
 
     <div class="field">
 
-        <label>Default Brick Rate (₹)</label>
+        <label>ડિફોલ્ટ ઈંટનો ભાવ (₹)</label>
 
         <input
             type="number"
@@ -407,7 +554,7 @@ input:focus {
 
     <div class="field">
 
-        <label>Total GST (%)</label>
+        <label>કુલ GST (%)</label>
 
         <input
             type="number"
@@ -444,8 +591,11 @@ input:focus {
     </div>
 
 
-    <button class="save-btn" onclick="saveSettings()">
-        Save Settings
+    <button
+        class="save-btn"
+        onclick="saveSettings()"
+    >
+        સેટિંગ્સ સાચવો
     </button>
 
 </div>
@@ -455,9 +605,9 @@ input:focus {
 
 <script>
 
-/* =========================
+/* =====================================
    SETTINGS
-========================= */
+===================================== */
 
 let settings = {
 
@@ -472,14 +622,23 @@ let settings = {
 };
 
 
-/* =========================
+/* =====================================
+   CURRENT MODE
+===================================== */
+
+let currentMode = "regular";
+
+
+/* =====================================
    LOAD SETTINGS
-========================= */
+===================================== */
 
 function loadSettings() {
 
     const saved =
-        localStorage.getItem("brickCalculatorSettings");
+        localStorage.getItem(
+            "brickCalculatorSettings"
+        );
 
     if (saved) {
 
@@ -489,117 +648,212 @@ function loadSettings() {
 
         } catch (error) {
 
-            console.log("Using default settings.");
+            console.log(
+                "Using default settings."
+            );
 
         }
 
     }
 
-    document.getElementById("brickRate").value =
-        settings.brickRate;
+    document.getElementById(
+        "brickRate"
+    ).value = settings.brickRate;
 
     updateGSTDisplay();
+
 }
 
 
-/* =========================
-   RUPEE FORMAT
-========================= */
+/* =====================================
+   MODE SWITCH
+===================================== */
+
+function setMode(mode) {
+
+    currentMode = mode;
+
+    const regularInputs =
+        document.getElementById(
+            "regularInputs"
+        );
+
+    const reverseInputs =
+        document.getElementById(
+            "reverseInputs"
+        );
+
+    const regularBtn =
+        document.getElementById(
+            "regularModeBtn"
+        );
+
+    const reverseBtn =
+        document.getElementById(
+            "reverseModeBtn"
+        );
+
+    const subtitle =
+        document.getElementById(
+            "subtitle"
+        );
+
+    const resultCard =
+        document.getElementById(
+            "resultCard"
+        );
+
+
+    resultCard.style.display = "none";
+
+
+    if (mode === "regular") {
+
+        regularInputs.style.display =
+            "block";
+
+        reverseInputs.style.display =
+            "none";
+
+        regularBtn.classList.add(
+            "active"
+        );
+
+        reverseBtn.classList.remove(
+            "active"
+        );
+
+        subtitle.textContent =
+            "ઈંટોની સંખ્યાથી બિલની ગણતરી";
+
+    }
+
+    else {
+
+        regularInputs.style.display =
+            "none";
+
+        reverseInputs.style.display =
+            "block";
+
+        regularBtn.classList.remove(
+            "active"
+        );
+
+        reverseBtn.classList.add(
+            "active"
+        );
+
+        subtitle.textContent =
+            "બિલની રકમથી ઈંટોની ગણતરી";
+
+    }
+
+
+    document.getElementById(
+        "error"
+    ).style.display = "none";
+
+}
+
+
+/* =====================================
+   MONEY FORMAT
+===================================== */
 
 function money(value) {
 
-    return new Intl.NumberFormat("en-IN", {
-
-        style: "currency",
-
-        currency: "INR",
-
-        minimumFractionDigits: 2,
-
-        maximumFractionDigits: 2
-
-    }).format(value);
+    return new Intl.NumberFormat(
+        "en-IN",
+        {
+            style: "currency",
+            currency: "INR",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ).format(value);
 
 }
 
 
-/* =========================
+/* =====================================
    GST DISPLAY
-========================= */
+===================================== */
 
 function updateGSTDisplay() {
 
-    document.getElementById("gstDisplay").textContent =
+    document.getElementById(
+        "gstDisplay"
+    ).textContent =
         settings.gst + "%";
 
-    document.getElementById("cgstDisplay").textContent =
+
+    document.getElementById(
+        "cgstDisplay"
+    ).textContent =
         settings.cgst + "%";
 
-    document.getElementById("sgstDisplay").textContent =
+
+    document.getElementById(
+        "sgstDisplay"
+    ).textContent =
         settings.sgst + "%";
 
-    document.getElementById("cgstLabel").textContent =
-        "CGST (" + settings.cgst + "%)";
 
-    document.getElementById("sgstLabel").textContent =
-        "SGST (" + settings.sgst + "%)";
+    document.getElementById(
+        "cgstLabel"
+    ).textContent =
+        "CGST (" +
+        settings.cgst +
+        "%)";
+
+
+    document.getElementById(
+        "sgstLabel"
+    ).textContent =
+        "SGST (" +
+        settings.sgst +
+        "%)";
+
 }
 
 
-/* =========================
-   NUMBER → WORDS
-   INDIAN NUMBER SYSTEM
-========================= */
+/* =====================================
+   ENGLISH NUMBER TO WORDS
+===================================== */
 
 function numberToWords(num) {
 
     num = Math.round(num);
 
     if (num === 0) {
+
         return "Zero";
+
     }
 
 
     const ones = [
 
         "",
-
         "One",
-
         "Two",
-
         "Three",
-
         "Four",
-
         "Five",
-
         "Six",
-
         "Seven",
-
         "Eight",
-
         "Nine",
-
         "Ten",
-
         "Eleven",
-
         "Twelve",
-
         "Thirteen",
-
         "Fourteen",
-
         "Fifteen",
-
         "Sixteen",
-
         "Seventeen",
-
         "Eighteen",
-
         "Nineteen"
 
     ];
@@ -608,29 +862,20 @@ function numberToWords(num) {
     const tens = [
 
         "",
-
         "",
-
         "Twenty",
-
         "Thirty",
-
         "Forty",
-
         "Fifty",
-
         "Sixty",
-
         "Seventy",
-
         "Eighty",
-
         "Ninety"
 
     ];
 
 
-    function convertBelowThousand(n) {
+    function belowThousand(n) {
 
         let result = "";
 
@@ -638,7 +883,9 @@ function numberToWords(num) {
         if (n >= 100) {
 
             result +=
-                ones[Math.floor(n / 100)] +
+                ones[
+                    Math.floor(n / 100)
+                ] +
                 " Hundred ";
 
             n %= 100;
@@ -649,16 +896,21 @@ function numberToWords(num) {
         if (n >= 20) {
 
             result +=
-                tens[Math.floor(n / 10)];
+                tens[
+                    Math.floor(n / 10)
+                ];
 
             if (n % 10 !== 0) {
 
                 result +=
-                    " " + ones[n % 10];
+                    " " +
+                    ones[n % 10];
 
             }
 
-        } else if (n > 0) {
+        }
+
+        else if (n > 0) {
 
             result += ones[n];
 
@@ -673,17 +925,26 @@ function numberToWords(num) {
     let result = "";
 
 
-    const crore = Math.floor(num / 10000000);
+    const crore =
+        Math.floor(
+            num / 10000000
+        );
 
     num %= 10000000;
 
 
-    const lakh = Math.floor(num / 100000);
+    const lakh =
+        Math.floor(
+            num / 100000
+        );
 
     num %= 100000;
 
 
-    const thousand = Math.floor(num / 1000);
+    const thousand =
+        Math.floor(
+            num / 1000
+        );
 
     num %= 1000;
 
@@ -691,7 +952,7 @@ function numberToWords(num) {
     if (crore > 0) {
 
         result +=
-            convertBelowThousand(crore) +
+            belowThousand(crore) +
             " Crore ";
 
     }
@@ -700,7 +961,7 @@ function numberToWords(num) {
     if (lakh > 0) {
 
         result +=
-            convertBelowThousand(lakh) +
+            belowThousand(lakh) +
             " Lakh ";
 
     }
@@ -709,7 +970,7 @@ function numberToWords(num) {
     if (thousand > 0) {
 
         result +=
-            convertBelowThousand(thousand) +
+            belowThousand(thousand) +
             " Thousand ";
 
     }
@@ -718,7 +979,7 @@ function numberToWords(num) {
     if (num > 0) {
 
         result +=
-            convertBelowThousand(num);
+            belowThousand(num);
 
     }
 
@@ -728,17 +989,20 @@ function numberToWords(num) {
 }
 
 
-/* =========================
-   RUPEES + PAISE IN WORDS
-========================= */
+/* =====================================
+   ENGLISH AMOUNT IN WORDS
+===================================== */
 
 function amountInWords(amount) {
 
     const rupees =
         Math.floor(amount);
 
+
     const paise =
-        Math.round((amount - rupees) * 100);
+        Math.round(
+            (amount - rupees) * 100
+        );
 
 
     let result =
@@ -758,82 +1022,141 @@ function amountInWords(amount) {
 
     result += " Only";
 
+
     return result;
 
 }
 
 
-/* =========================
+/* =====================================
    CALCULATE
-========================= */
+===================================== */
 
 function calculate() {
 
-    const finalAmount =
-        parseFloat(
-            document.getElementById("finalAmount").value
-        );
-
-
     const rate =
         parseFloat(
-            document.getElementById("brickRate").value
+            document.getElementById(
+                "brickRate"
+            ).value
         );
 
 
     const error =
-        document.getElementById("error");
+        document.getElementById(
+            "error"
+        );
 
 
     error.style.display = "none";
 
 
-    if (!finalAmount || finalAmount <= 0) {
-
-        error.textContent =
-            "Please enter a valid final bill amount.";
-
-        error.style.display = "block";
-
-        return;
-
-    }
-
-
     if (!rate || rate <= 0) {
 
         error.textContent =
-            "Please enter a valid brick rate.";
+            "કૃપા કરીને ઈંટનો યોગ્ય ભાવ નાખો.";
 
-        error.style.display = "block";
+        error.style.display =
+            "block";
 
         return;
 
     }
 
 
-    /* Remove GST */
+    let quantity;
 
-    const subtotalExact =
-        finalAmount /
-        (1 + settings.gst / 100);
+    let subtotal;
 
 
-    /* Find quantity */
+    /* =================================
+       REGULAR MODE
+       ઈંટ → બિલ
+    ================================= */
 
-    const exactQuantity =
-        subtotalExact / rate;
+    if (currentMode === "regular") {
+
+        quantity =
+            parseInt(
+                document.getElementById(
+                    "quantityInput"
+                ).value
+            );
 
 
-    const quantity =
-        Math.round(exactQuantity);
+        if (!quantity || quantity <= 0) {
+
+            error.textContent =
+                "કૃપા કરીને ઈંટોની યોગ્ય સંખ્યા નાખો.";
+
+            error.style.display =
+                "block";
+
+            return;
+
+        }
 
 
-    /* Recalculate using whole bricks */
+        subtotal =
+            quantity * rate;
 
-    const subtotal =
-        quantity * rate;
+    }
 
+
+    /* =================================
+       REVERSE MODE
+       બિલ → ઈંટ
+    ================================= */
+
+    else {
+
+        const finalAmount =
+            parseFloat(
+                document.getElementById(
+                    "finalAmountInput"
+                ).value
+            );
+
+
+        if (
+            !finalAmount ||
+            finalAmount <= 0
+        ) {
+
+            error.textContent =
+                "કૃપા કરીને અંતિમ બિલની યોગ્ય રકમ નાખો.";
+
+            error.style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        const subtotalExact =
+            finalAmount /
+            (
+                1 +
+                settings.gst / 100
+            );
+
+
+        quantity =
+            Math.round(
+                subtotalExact / rate
+            );
+
+
+        subtotal =
+            quantity * rate;
+
+    }
+
+
+    /* =================================
+       GST
+    ================================= */
 
     const cgst =
         subtotal *
@@ -851,64 +1174,122 @@ function calculate() {
         sgst;
 
 
-    /* Display */
+    /* =================================
+       DISPLAY
+    ================================= */
 
-    document.getElementById("quantity").textContent =
-        quantity.toLocaleString("en-IN") +
-        " bricks";
+    document.getElementById(
+        "quantityResult"
+    ).textContent =
+        quantity.toLocaleString(
+            "en-IN"
+        ) +
+        " ઈંટ";
 
 
-    document.getElementById("rateResult").textContent =
+    document.getElementById(
+        "rateResult"
+    ).textContent =
         money(rate);
 
 
-    document.getElementById("subtotal").textContent =
+    document.getElementById(
+        "subtotal"
+    ).textContent =
         money(subtotal);
 
 
-    document.getElementById("cgst").textContent =
+    document.getElementById(
+        "cgst"
+    ).textContent =
         money(cgst);
 
 
-    document.getElementById("sgst").textContent =
+    document.getElementById(
+        "sgst"
+    ).textContent =
         money(sgst);
 
 
-    document.getElementById("finalResult").textContent =
+    document.getElementById(
+        "finalResult"
+    ).textContent =
         money(calculatedFinal);
 
 
-    /* Amount in words */
+    /*
+       IMPORTANT:
+       Amount in Words stays ENGLISH
+    */
 
-    document.getElementById("amountWords").textContent =
-        amountInWords(calculatedFinal);
+    document.getElementById(
+        "amountWords"
+    ).textContent =
+        amountInWords(
+            calculatedFinal
+        );
 
 
-    document.getElementById("resultCard").style.display =
+    if (currentMode === "regular") {
+
+        document.getElementById(
+            "resultNote"
+        ).textContent =
+            "ઈંટોની સંખ્યા પ્રમાણે બિલની ગણતરી કરવામાં આવી છે.";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "resultNote"
+        ).textContent =
+            "ઈંટોની સંખ્યા નજીકની આખી ઈંટ સુધી રાઉન્ડ કરવામાં આવી છે. તેથી અંતિમ બિલમાં થોડો ફરક હોઈ શકે છે.";
+
+    }
+
+
+    document.getElementById(
+        "resultCard"
+    ).style.display =
         "block";
 
 }
 
 
-/* =========================
+/* =====================================
    SETTINGS
-========================= */
+===================================== */
 
 function openSettings() {
 
-    document.getElementById("settingRate").value =
+    document.getElementById(
+        "settingRate"
+    ).value =
         settings.brickRate;
 
-    document.getElementById("settingGST").value =
+
+    document.getElementById(
+        "settingGST"
+    ).value =
         settings.gst;
 
-    document.getElementById("settingCGST").value =
+
+    document.getElementById(
+        "settingCGST"
+    ).value =
         settings.cgst;
 
-    document.getElementById("settingSGST").value =
+
+    document.getElementById(
+        "settingSGST"
+    ).value =
         settings.sgst;
 
-    document.getElementById("settingsModal").style.display =
+
+    document.getElementById(
+        "settingsModal"
+    ).style.display =
         "block";
 
 }
@@ -916,39 +1297,49 @@ function openSettings() {
 
 function closeSettings() {
 
-    document.getElementById("settingsModal").style.display =
+    document.getElementById(
+        "settingsModal"
+    ).style.display =
         "none";
 
 }
 
 
-/* =========================
+/* =====================================
    SAVE SETTINGS
-========================= */
+===================================== */
 
 function saveSettings() {
 
     const rate =
         parseFloat(
-            document.getElementById("settingRate").value
+            document.getElementById(
+                "settingRate"
+            ).value
         );
 
 
     const gst =
         parseFloat(
-            document.getElementById("settingGST").value
+            document.getElementById(
+                "settingGST"
+            ).value
         );
 
 
     const cgst =
         parseFloat(
-            document.getElementById("settingCGST").value
+            document.getElementById(
+                "settingCGST"
+            ).value
         );
 
 
     const sgst =
         parseFloat(
-            document.getElementById("settingSGST").value
+            document.getElementById(
+                "settingSGST"
+            ).value
         );
 
 
@@ -960,7 +1351,9 @@ function saveSettings() {
         sgst < 0
     ) {
 
-        alert("Please enter valid values.");
+        alert(
+            "કૃપા કરીને યોગ્ય માહિતી નાખો."
+        );
 
         return;
 
@@ -989,7 +1382,9 @@ function saveSettings() {
     );
 
 
-    document.getElementById("brickRate").value =
+    document.getElementById(
+        "brickRate"
+    ).value =
         settings.brickRate;
 
 
@@ -1000,14 +1395,16 @@ function saveSettings() {
 }
 
 
-/* =========================
-   CLOSE SETTINGS
-========================= */
+/* =====================================
+   CLOSE MODAL
+===================================== */
 
 window.onclick = function(event) {
 
     const modal =
-        document.getElementById("settingsModal");
+        document.getElementById(
+            "settingsModal"
+        );
 
 
     if (event.target === modal) {
@@ -1019,9 +1416,9 @@ window.onclick = function(event) {
 };
 
 
-/* =========================
+/* =====================================
    START
-========================= */
+===================================== */
 
 loadSettings();
 
